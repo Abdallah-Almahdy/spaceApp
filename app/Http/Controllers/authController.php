@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\toAdmin;
 use App\Models\User;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
@@ -21,17 +23,25 @@ class authController extends Controller
 
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
 
-        ]);
-        $token = $user->createToken('Token')->plainTextToken;
+        try{
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        $request->user()->sendEmailVerificationNotification();
+            $token = $user->createToken('Token')->plainTextToken;
 
+        }catch(\Exception $e)
+        {
+            $user->delete();
+            return response()->json(['message' => 'Registration failed', 'error' => $e->getMessage()], 500);
+        }
+        $user->sendEmailVerificationNotification();
+        Mail::to('abdallah@gmail.com')->send(new toAdmin($user));
         return response()->json(['token' => $token, 'user' => $user], 201);
+
     }
 
     function verifyEmail(Request $request)
@@ -68,10 +78,16 @@ class authController extends Controller
             'password' => 'required',
         ]);
 
+
         $user = User::where('email', $request->email)->first();
+
+
 
         if (! $user->hasVerifiedEmail()) {
             return response()->json(['message' => 'Please verify your email before logging in.'], 403);
+        }
+        if (!$user->isActive) {
+            return response()->json(['message' => 'Your account is not active. Please wait until actived by admin.'], 403);
         }
 
         if (!$user || ! Hash::check($request->password, $user->password)) {
@@ -136,10 +152,33 @@ class authController extends Controller
             }
         );
 
-        
+
         return $status === Password::PASSWORD_RESET
             ? response()->json(['message' => 'Password has been reset successfully!'])
             : response()->json(['message' => __($status)], 400);
+    }
+
+
+
+    public function confirm(Request $request,$id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        if(!$request->user()->isAdmin)
+        {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+        if ($user->isActive) {
+            return response()->json(['message' => 'User is already active'], 400);
+        }
+
+        $user->isActive = true;
+        $user->save();
+
+        return response()->json(['message' => 'User activated successfully'], 200);
     }
 
 

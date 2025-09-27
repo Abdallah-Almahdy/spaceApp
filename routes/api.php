@@ -5,7 +5,7 @@ use App\Http\Controllers\ReportController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,3 +26,10 @@ Route::get('/email/verify/{id}/{hash}', [authController::class, 'Verifylink'])->
 Route::post('/logout', [authController::class, 'logout'])->middleware('auth:sanctum');
 Route::post('/password/forgot', [authController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::get('/admin/users/{id}/confirm', [authController::class, 'confirm'])->middleware('auth:sanctum');
+
+
+
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/reports/download/{filename}', [ReportController::class, 'download'])->name('reports.download');
+Route::get('/reports/view/{filename}', [ReportController::class, 'view'])->name('reports.view');

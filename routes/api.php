@@ -21,15 +21,22 @@ use Illuminate\Support\Facades\Storage;
 
 Route::post('/register', [authController::class, 'register']);
 Route::post('/login', [authController::class, 'login']);
-Route::post('/email/verify', [authController::class, 'verifyEmail'])->middleware('auth:sanctum');
-Route::get('/email/verify/{id}/{hash}', [authController::class, 'Verifylink'])->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
 Route::post('/logout', [authController::class, 'logout'])->middleware('auth:sanctum');
-Route::post('/password/forgot', [authController::class, 'forgotPassword']);
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-Route::get('/admin/users/{id}/confirm', [authController::class, 'confirm'])->middleware('auth:sanctum');
+Route::get('/user', [authController::class, 'user'])->middleware('auth:sanctum');
+
+// Route::post('/email/verify', [authController::class, 'verifyEmail'])->middleware('auth:sanctum');
+// Route::get('/email/verify/{id}/{hash}', [authController::class, 'Verifylink'])->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
+
+
+// Route::post('/password/forgot', [authController::class, 'forgotPassword']);
+// Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+// Route::get('/admin/users/{id}/confirm', [authController::class, 'confirm'])->middleware('auth:sanctum');
 
 
 
 Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 Route::get('/reports/download/{filename}', [ReportController::class, 'download'])->name('reports.download');
 Route::get('/reports/view/{filename}', [ReportController::class, 'view'])->name('reports.view');
+route::get('/report',function(){
+   return view('pdf.daily-report');
+});

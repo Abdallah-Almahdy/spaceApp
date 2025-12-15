@@ -11,7 +11,7 @@ return [
     | in dompdf_config.inc.php. You can also override the entire config file.
     |
     */
-    'show_warnings' => false,   // Throw an Exception on warnings from dompdf
+    'show_warnings' => true,   // Throw an Exception on warnings from dompdf
 
     'public_path' => null,  // Override the public path if needed
 
@@ -56,6 +56,25 @@ return [
          * Note: This directory must exist and be writable by the webserver process.
          */
         'font_cache' => storage_path('fonts'),
+        'fonts' => [
+            'amiri' => [
+                'normal' => storage_path('fonts/Amiri-Regular.ttf'),
+                'bold'   => storage_path('fonts/Amiri-Bold.ttf'),
+            ],
+
+            'cairo' => [
+                'normal'      => storage_path('fonts/Cairo-Regular.ttf'),
+                'bold'        => storage_path('fonts/Cairo-Bold.ttf'),
+                'black'       => storage_path('fonts/Cairo-Black.ttf'),
+                'extra_bold'  => storage_path('fonts/Cairo-ExtraBold.ttf'),
+                'semi_bold'   => storage_path('fonts/Cairo-SemiBold.ttf'),
+                'medium'      => storage_path('fonts/Cairo-Medium.ttf'),
+                'light'       => storage_path('fonts/Cairo-Light.ttf'),
+                'extra_light' => storage_path('fonts/Cairo-ExtraLight.ttf'),
+            ],
+        ],
+
+        'unicode_enabled' => true,
 
         /**
          * The location of a temporary directory.
@@ -110,7 +129,7 @@ return [
         /**
          * Whether to enable font subsetting or not.
          */
-        'enable_font_subsetting' => false,
+        'enable_font_subsetting' => true,
 
         /**
          * The PDF rendering backend to use
@@ -267,7 +286,7 @@ return [
          *
          * @var bool
          */
-        'enable_remote' => false,
+        'enable_remote' => true,
 
         /**
          * List of allowed remote hosts
@@ -286,7 +305,7 @@ return [
         /**
          * A ratio applied to the fonts height to be more like browsers' line height
          */
-        'font_height_ratio' => 1.1,
+        'font_height_ratio' => 1.2,
 
         /**
          * Use the HTML5 Lib parser

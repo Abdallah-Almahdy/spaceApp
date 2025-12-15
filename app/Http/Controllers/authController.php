@@ -13,13 +13,23 @@ use Illuminate\Support\Str;
 
 class authController extends Controller
 {
+    public function user(Request $request)
+    {
+        return response()->json($request->user());
+    }
     public function register(Request $request)
     {
 
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/|regex:/[@$!%*#?&]/',
+            'password' => 'required|min:8',
+            'confirmPassword' => 'required|same:password',
+            'phone' => 'nullable|string',
+            'country' => 'nullable|string',
+            'Affiliation' => 'nullable|string',
+            'level' => 'nullable|string',
+            'img' => 'nullable|string',
 
         ]);
 
@@ -31,6 +41,13 @@ class authController extends Controller
                 'password' => Hash::make($request->password),
             ]);
 
+            $user->profile()->create([
+                'country' => $request->country,
+                'Affiliation' => $request->Affiliation,
+                'level' => $request->level,
+                'phone' => $request->phone,
+            ]);
+
             $token = $user->createToken('Token')->plainTextToken;
 
         }catch(\Exception $e)
@@ -38,8 +55,8 @@ class authController extends Controller
             $user->delete();
             return response()->json(['message' => 'Registration failed', 'error' => $e->getMessage()], 500);
         }
-        $user->sendEmailVerificationNotification();
-        Mail::to('abdallah@gmail.com')->send(new toAdmin($user));
+        // $user->sendEmailVerificationNotification();
+        // Mail::to('abdallah@gmail.com')->send(new toAdmin($user));
         return response()->json(['token' => $token, 'user' => $user], 201);
 
     }
@@ -82,13 +99,13 @@ class authController extends Controller
         $user = User::where('email', $request->email)->first();
 
 
+        // if (! $user->hasVerifiedEmail()) {
+        //     return response()->json(['message' => 'Please verify your email before logging in.'], 403);
+        // }
 
-        if (! $user->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Please verify your email before logging in.'], 403);
-        }
-        if (!$user->isActive) {
-            return response()->json(['message' => 'Your account is not active. Please wait until actived by admin.'], 403);
-        }
+        // if (!$user->isActive) {
+        //     return response()->json(['message' => 'Your account is not active. Please wait until actived by admin.'], 403);
+        // }
 
         if (!$user || ! Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
